@@ -36,7 +36,7 @@ with st.sidebar.expander("Admin Access"):
 st.sidebar.header("Map Controls")
 
 custom_countries = [
-    "Austria","Belarus","Bosnia and Herzegovina","Cyprus","Czech Republic","Finland"
+    "Austria","Belarus","Bosnia and Herzegovina","Cyprus","Czech Republic","Finland",
     "Georgia","Greece","Hungary","Ireland","Kosovo","Latvia","Luxembourg","Macedonia",
     "Malta","Montenegro","Romania","Serbia","Slovakia","Slovenia","Ukraine","Belgium",
     "Croatia","Denmark","Estonia","France","Germany","Lithuania","Norway","Portugal", 
