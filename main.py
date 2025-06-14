@@ -9,10 +9,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Add functions for saving and loading country colors
+def save_country_colors():
+    """Save country colors to a JSON file"""
+    colors_file_path = os.path.join(os.path.dirname(__file__), 'country_colors.json')
+    with open(colors_file_path, 'w') as f:
+        json.dump(st.session_state.country_colors, f)
+
+def load_country_colors():
+    """Load country colors from a JSON file if it exists"""
+    colors_file_path = os.path.join(os.path.dirname(__file__), 'country_colors.json')
+    if os.path.exists(colors_file_path):
+        try:
+            with open(colors_file_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Error loading colors: {e}")
+            return {}
+    return {}
+
 if 'admin_authenticated' not in st.session_state:
     st.session_state.admin_authenticated = False
 if 'country_colors' not in st.session_state:
-    st.session_state.country_colors = {}
+    # Load colors from file instead of starting with empty dict
+    st.session_state.country_colors = load_country_colors()
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
@@ -74,6 +94,7 @@ if st.session_state.admin_authenticated:
             "color": selected_color,
             "color_name": selected_color_name
         }
+        save_country_colors()  # Save colors after changes
         st.success(f"Color {selected_color_name} applied to {selected_country}")
     
 st.sidebar.subheader("Currently Colored Countries")
@@ -99,11 +120,13 @@ if st.session_state.country_colors:
                         "color": color_options[edit_color],
                         "color_name": edit_color
                     }
+                    save_country_colors()  # Save colors after updating
                     st.success(f"Updated {edit_country} to {edit_color}")
                     st.rerun()
                 
                 if st.button("Clear"):
                     del st.session_state.country_colors[edit_country]
+                    save_country_colors()  # Save colors after removing a country
                     st.success(f"Cleared color for {edit_country}")
                     st.rerun()
     st.sidebar.subheader("Color Legend")
@@ -122,6 +145,7 @@ else:
 if st.session_state.admin_authenticated and st.session_state.country_colors:
     if st.sidebar.button("Clear All Colors"):
         st.session_state.country_colors = {}
+        save_country_colors()  # Save the empty state after clearing all
         st.success("All country colors cleared")
         st.rerun()
 
