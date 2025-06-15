@@ -26,7 +26,7 @@ Netherlands,Green
 Norway,Green
 Portugal,Green
 Romania,Green
-Serbia,Green
+Republic of Serbia,Green
 Slovakia,Green
 Slovenia,Green
 Spain,Green
@@ -41,7 +41,7 @@ Azerbaijan,Yellow
 Bulgaria,Yellow
 Canada,Yellow
 Channel Islands,Yellow
-Combodia,Yellow
+Cambodia,Yellow
 Greenland,Yellow
 Hongkong,Yellow
 Iceland,Yellow
@@ -56,14 +56,14 @@ Morocco,Yellow
 Myanmar,Yellow
 Nepal,Yellow
 New Zealand,Yellow
-Philipnese,Yellow
+Philippines,Yellow
 San Mariono,Yellow
 Sri Lanka,Yellow
 Thailand,Yellow
 Turkey,Yellow
 United Kingdom,Yellow
 Vietnam,Yellow
-Afganistan,Red
+Afghanistan,Red
 Algeria,Red
 Angola,Red
 Argentina,Red
@@ -87,11 +87,10 @@ Chile,Red
 China,Red
 China,Red
 Colombia,Red
-Congo,Red
 Costa Rica,Red
 Cuba,Red
 Curacao,Red
-DR Congo,Red
+Democratic Republic of the Congo,Red
 Djibouti,Red
 Domanican Republic,Red
 Dominica,Red
@@ -100,7 +99,6 @@ Ecuador,Red
 Egypt,Red
 El Salvador,Red
 Equatorial Guinea,Red
-Eswatini (Swaziland),Red
 Ethiopia,Red
 Fiji,Red
 Gabon,Red
@@ -148,6 +146,7 @@ Papua New Guinea,Red
 Paraguay,Red
 Peru,Red
 Qatar,Red
+Republic of the Congo,Red
 Rwanda,Red
 Saint Lucia,Red
 Samoa,Red
@@ -164,21 +163,22 @@ South Korea,Red
 State of Palestine,Red
 Sudan,Red
 Suriname,Red
+Swaziland,Red
 Syria,Red
 Taiwan,Red
 Tajikistan,Red
-Tanzania,Red
 Timor-Leste,Red
 Togo,Red
 Trinidad & Tobago,Red
 Tunisia,Red
 United Arab Emirates,Red
+United Republic of Tanzania,Red
 United States of America,Red
 Uganda,Red
 Uruguay,Red
 Uzbekistan,Red
 Vanuatu,Red
-Venezeula,Red
+Venezuela,Red
 Yemen,Red
 Zambia,Red
 Zimbabwe,Red
