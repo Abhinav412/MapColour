@@ -6,10 +6,10 @@ import requests
 from branca.colormap import linear
 import os
 from dotenv import load_dotenv
+import pandas as pd
 
 load_dotenv()
 
-# Add functions for saving and loading country colors
 def save_country_colors():
     """Save country colors to a JSON file"""
     colors_file_path = os.path.join(os.path.dirname(__file__), 'country_colors.json')
@@ -28,11 +28,44 @@ def load_country_colors():
             return {}
     return {}
 
+def initialize_colors_from_csv():
+    try:
+        df = pd.read_csv("countries.csv")
+        colors_dict = {}
+        color_mapping = {
+            "Red": "#FF0000",
+            "Green": "#00FF00",
+            "Yellow": "#FFFF00"
+        }
+        
+        for _, row in df.iterrows():
+            country = row['Countries']
+            color_name = row['Colour']
+            if color_name in color_mapping:
+                colors_dict[country] = {
+                    "color": color_mapping[color_name],
+                    "color_name": color_name
+                }
+        
+        with open(os.path.join(os.path.dirname(__file__), 'country_colors.json'), 'w') as f:
+            json.dump(colors_dict, f)
+        
+        return colors_dict
+    except Exception as e:
+        st.error(f"Error initializing colors from CSV: {e}")
+        return {}
+
 if 'admin_authenticated' not in st.session_state:
     st.session_state.admin_authenticated = False
 if 'country_colors' not in st.session_state:
-    # Load colors from file instead of starting with empty dict
     st.session_state.country_colors = load_country_colors()
+
+if st.session_state.admin_authenticated:
+    if st.sidebar.button("Initialize Colors from CSV"):
+        colors = initialize_colors_from_csv()
+        st.session_state.country_colors = colors
+        st.success("Colors initialized from CSV file")
+        st.rerun()
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
@@ -55,18 +88,8 @@ with st.sidebar.expander("Admin Access"):
 
 st.sidebar.header("Map Controls")
 
-custom_countries = [
-    "Austria","Belarus","Bosnia and Herzegovina","Cyprus","Czech Republic","Finland",
-    "Georgia","Greece","Hungary","Ireland","Kosovo","Latvia","Luxembourg","Macedonia",
-    "Malta","Montenegro","Romania","Serbia","Slovakia","Slovenia","Ukraine","Belgium",
-    "Croatia","Denmark","Estonia","France","Germany","Lithuania","Norway","Portugal", 
-    "Spain","Sweden","Switzerland","Netherlands","Albania","Andorra","Armenia","Azerbaijan",
-    "Bulgaria","Channel Islands","Greenland","Iceland","Israel","Italy","Moldova","Monaco", 
-    "Morocco","Poland","San Marino","Turkey","Indonesia","Laos","Malaysia","Mongolia","Myanmar",
-    "United Kingdom","Philippines","Singapore","South Korea","Taiwan","Thailand","Vietnam","Bahrain",
-    "Japan","Egypt","Jordan","Kuwait","Lebanon","Oman","Qatar","Saudi Arabia",
-    "United Arab Emirates","Australia","Fiji","New Zealand"
-]
+df = pd.read_csv("countries.csv")
+custom_countries = df['Countries'].tolist()
 
 @st.cache_data
 def get_geojson_data():
@@ -94,7 +117,7 @@ if st.session_state.admin_authenticated:
             "color": selected_color,
             "color_name": selected_color_name
         }
-        save_country_colors()  # Save colors after changes
+        save_country_colors()
         st.success(f"Color {selected_color_name} applied to {selected_country}")
     
 st.sidebar.subheader("Currently Colored Countries")
