@@ -39,12 +39,12 @@ Armenia,Yellow
 Australia,Yellow
 Azerbaijan,Yellow
 Bulgaria,Yellow
-Canada,Yellow
+Canada,Green
 Channel Islands,Yellow
 Cambodia,Yellow
-Greenland,Yellow
+Greenland,Green
 Hongkong,Yellow
-Iceland,Yellow
+Iceland,Green
 Indonesia,Yellow
 Israel,Yellow
 Italy,Yellow
@@ -52,39 +52,39 @@ Laos,Yellow
 Malaysia,Yellow
 Moldova,Yellow
 Monaco,Yellow
-Morocco,Yellow
+Morocco,Green
 Myanmar,Yellow
 Nepal,Yellow
-New Zealand,Yellow
-Philippines,Yellow
+New Zealand,Green
+Philippines,Green
 San Mariono,Yellow
 Sri Lanka,Yellow
 Thailand,Yellow
-Turkey,Yellow
+Turkey,Green
 United Kingdom,Yellow
 Vietnam,Yellow
 Afghanistan,Red
-Algeria,Red
-Angola,Red
+Algeria,Yellow
+Angola,Yellow
 Argentina,Red
 Bahamas,Red
-Bahrain,Red
+Bahrain,Yellow
 Bangladesh,Red
 Barbados,Red
 Belize,Red
 Benin,Red
-Bhutan,Red
+Bhutan,Yellow
 Bolivia,Red
-Botswana,Red
+Botswana,Yellow
 Brazil,Red
-Brunei,Red
+Brunei,Yellow
 Burkina Faso,Red
 Burundi,Red
 Cabo Verde,Red
 Cameroon,Red
 Chad,Red
 Chile,Red
-China,Red
+China,
 China,Red
 Colombia,Red
 Costa Rica,Red
@@ -92,93 +92,94 @@ Cuba,Red
 Curacao,Red
 Democratic Republic of the Congo,Red
 Djibouti,Red
-Domanican Republic,Red
+Domanican Republic,Yellow
 Dominica,Red
 Dominican Republic,Red
 Ecuador,Red
-Egypt,Red
+Egypt,Yellow
 El Salvador,Red
 Equatorial Guinea,Red
 Ethiopia,Red
 Fiji,Red
 Gabon,Red
 Gambia,Red
-Ghana,Red
+Ghana,Yellow
 Guatemala,Red
 Guinea,Red
 Guinea-Bissau,Red
 Guyana,Red
 Haiti,Red
 Honduras,Red
-India,Red
+India,
 Iran,Red
 Iraq,Red
 Ivory Coast,Red
 Jamaica,Red
-Japan,Red
-Jordan,Red
+Japan,Yellow
+Jordan,Yellow
 Kazakhstan,Red
 Kenya,Red
 Kuwait,Red
 Kyrgyzstan,Red
-Lebanon,Red
+Lebanon,Yellow
 Lesotho,Red
 Liberia,Red
 Libya,Red
-Madagascar,Red
+Madagascar,Yellow
 Malawi,Red
 Maldives,Red
 Mali,Red
 Mauritania,Red
-Mauritius,Red
+Mauritius,Yellow
 Mexico,Red
 Micronesia,Red
-Mongolia,Red
-Mozambique,Red
-Namibia,Red
+Mongolia,Yellow
+Mozambique,Yellow
+Namibia,Yellow
 Nicaragua,Red
 Niger,Red
-Nigeria,Red
-Oman,Red
+Nigeria,Yellow
+Oman,Yellow
 Pakistan,Red
 Panama,Red
 Papua New Guinea,Red
 Paraguay,Red
 Peru,Red
-Qatar,Red
+Poland,Yellow
+Qatar,Yellow
 Republic of the Congo,Red
-Rwanda,Red
+Rwanda,Yellow
 Saint Lucia,Red
 Samoa,Red
 Sao Tome & Principe,Red
-Saudi Arabia,Red
-Senegal,Red
+Saudi Arabia,Yellow
+Senegal,Yellow
 Seychelles,Red
 Sierra Leone,Red
-Singapore,Red
+Singapore,Yellow
 Solomon Islands,Red
 Somalia,Red
-South Africa,Red
-South Korea,Red
+South Africa,Yellow
+South Korea,Yellow
 State of Palestine,Red
 Sudan,Red
 Suriname,Red
-Swaziland,Red
+Swaziland,Yellow
 Syria,Red
-Taiwan,Red
+Taiwan,Yellow
 Tajikistan,Red
 Timor-Leste,Red
-Togo,Red
+Togo,Yellow
 Trinidad & Tobago,Red
 Tunisia,Red
-United Arab Emirates,Red
-United Republic of Tanzania,Red
-United States of America,Red
-Uganda,Red
+United Arab Emirates,Yellow
+United Republic of Tanzania,Yellow
+United States of America,
+Uganda,Yellow
 Uruguay,Red
 Uzbekistan,Red
 Vanuatu,Red
 Venezuela,Red
 Yemen,Red
-Zambia,Red
-Zimbabwe,Red
+Zambia,Yellow
+Zimbabwe,Yellow
