@@ -2,76 +2,44 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import json
-import requests
-from branca.colormap import linear
 import os
-from dotenv import load_dotenv
 import pandas as pd
+from dotenv import load_dotenv
+import utils
 
 load_dotenv()
 
-def save_country_colors():
-    """Save country colors to a JSON file"""
-    colors_file_path = os.path.join(os.path.dirname(__file__), 'country_colors.json')
-    with open(colors_file_path, 'w') as f:
-        json.dump(st.session_state.country_colors, f)
+@st.cache_data
+def load_countries_list():
+    df = utils.get_all_countries_from_csv()
+    return df['Countries'].tolist()
 
-def load_country_colors():
-    """Load country colors from a JSON file if it exists"""
-    colors_file_path = os.path.join(os.path.dirname(__file__), 'country_colors.json')
-    if os.path.exists(colors_file_path):
-        try:
-            with open(colors_file_path, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            st.error(f"Error loading colors: {e}")
-            return {}
-    return {}
+@st.cache_data
+def get_geojson_data():
+    local_path = os.path.join(os.path.dirname(__file__), 'world_countries.json')
+    if os.path.exists(local_path):
+        with open(local_path, 'r') as f:
+            return json.load(f)
+    
+    import requests
+    url = "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
+    response = requests.get(url)
+    return response.json()
 
-def initialize_colors_from_csv():
-    try:
-        df = pd.read_csv("countries.csv")
-        colors_dict = {}
-        color_mapping = {
-            "Red": "#FF0000",
-            "Green": "#00FF00",
-            "Yellow": "#FFFF00"
-        }
-        
-        for _, row in df.iterrows():
-            country = row['Countries']
-            color_name = row['Colour']
-            if color_name in color_mapping:
-                colors_dict[country] = {
-                    "color": color_mapping[color_name],
-                    "color_name": color_name
-                }
-        
-        with open(os.path.join(os.path.dirname(__file__), 'country_colors.json'), 'w') as f:
-            json.dump(colors_dict, f)
-        
-        return colors_dict
-    except Exception as e:
-        st.error(f"Error initializing colors from CSV: {e}")
-        return {}
+def refresh_colors():
+    st.session_state.country_colors = utils.load_country_colors()
 
 if 'admin_authenticated' not in st.session_state:
     st.session_state.admin_authenticated = False
 if 'country_colors' not in st.session_state:
-    st.session_state.country_colors = load_country_colors()
-
-if st.session_state.admin_authenticated:
-    if st.sidebar.button("Initialize Colors from CSV"):
-        colors = initialize_colors_from_csv()
-        st.session_state.country_colors = colors
-        st.success("Colors initialized from CSV file")
-        st.rerun()
+    st.session_state.country_colors = utils.load_country_colors()
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 st.title("Interactive World Map")
 
-with st.sidebar.expander("Admin Access"):
+with st.sidebar:
+    st.header("Access Control")
     if st.session_state.admin_authenticated:
         st.success("Logged in as Admin")
         if st.button("Logout"):
@@ -85,124 +53,185 @@ with st.sidebar.expander("Admin Access"):
                 st.rerun()
             else:
                 st.error("Incorrect password")
+    
+    st.markdown("---")
 
-st.sidebar.header("Map Controls")
+nav_options = ["🗺️ Map Info"]
+if st.session_state.admin_authenticated:
+    nav_options.append("⚙️ Admin Panel")
 
-df = pd.read_csv("countries.csv")
-custom_countries = df['Countries'].tolist()
+selection = st.sidebar.radio("Navigation", nav_options)
 
-@st.cache_data
-def get_geojson_data():
-    url = "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
-    response = requests.get(url)
-    return response.json()
+if selection == "🗺️ Map Info":
+    st.sidebar.subheader("Country Locator")
+    all_countries = load_countries_list()
+    
+    default_index = 0
+    if 'search_focus' in st.session_state:
+        focus_val = st.session_state.search_focus
+        if focus_val in all_countries:
+            default_index = all_countries.index(focus_val)
+    
+    search_country = st.sidebar.selectbox("Search for a country:", ["None"] + all_countries, index=default_index + 1 if 'search_focus' in st.session_state else 0)
+    
+    if search_country == "None":
+        if 'search_focus' in st.session_state:
+            del st.session_state.search_focus
+    else:
+        st.session_state.search_focus = search_country
+
+if selection == "⚙️ Admin Panel":
+    st.sidebar.subheader("Admin Controls")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["🎨 Color Countries", "➕ Add Country", "➖ Remove Country", "📋 View All"])
+    
+    with tab1:
+        st.markdown("**Select a country and set its color**")
+        custom_countries = load_countries_list()
+        selected_country = st.selectbox("Select country:", custom_countries, key="color_country")
+        selected_color_name = st.selectbox("Set color:", list(utils.COLOR_MAPPING.keys()), key="color_select")
+        
+        if st.button("Apply Color", use_container_width=True, key="apply_color_btn"):
+            success, msg = utils.update_country_color(selected_country, selected_color_name)
+            if success:
+                refresh_colors()
+                st.success(msg)
+            else:
+                st.error(msg)
+    
+    with tab2:
+        st.markdown("**Add a new country to the list**")
+        new_country_name = st.text_input("Country Name", key="new_country_name")
+        new_country_color = st.selectbox("Initial Color", list(utils.COLOR_MAPPING.keys()), key="new_country_color")
+        
+        if st.button("Add Country", use_container_width=True, key="add_country_btn"):
+            if new_country_name.strip():
+                success, msg = utils.add_country(new_country_name.strip(), new_country_color)
+                if success:
+                    refresh_colors()
+                    st.success(msg)
+                else:
+                    st.error(msg)
+            else:
+                st.warning("Please enter a country name")
+    
+    with tab3:
+        st.markdown("**Remove a country from the list**")
+        remove_country = st.selectbox("Select country to remove:", ["None"] + load_countries_list(), key="remove_country_select")
+        
+        if remove_country != "None":
+            st.warning(f"You are about to remove '{remove_country}' from the list")
+            if st.button("Confirm Remove", use_container_width=True, key="remove_country_btn"):
+                success, msg = utils.remove_country(remove_country)
+                if success:
+                    refresh_colors()
+                    st.success(msg)
+                else:
+                    st.error(msg)
+    
+    with tab4:
+        st.markdown("**All Countries and Colors**")
+        df = utils.get_all_countries_from_csv()
+        if not df.empty:
+            df_display = df.copy()
+            df_display.columns = ['Country', 'Color']
+            st.dataframe(df_display, use_container_width=True)
+            
+            st.markdown(f"**Total: {len(df)} countries**")
+        else:
+            st.info("No countries in the list")
+    
+    st.divider()
+    
+    st.markdown("**Data Management**")
+    
+    if st.button("Migrate CSV to Supabase", use_container_width=True, help="One-time migration of countries from CSV to Supabase cloud database"):
+        with st.spinner("Migrating data..."):
+            count, success = utils.migrate_csv_to_supabase()
+        if success:
+            refresh_colors()
+            st.success(f"Successfully migrated {count} countries to Supabase!")
+        else:
+            st.error("Migration failed. Check Supabase connection.")
+    
+    if st.button("Export to CSV", use_container_width=True):
+        if utils.export_json_to_csv(st.session_state.country_colors):
+            st.success("Exported to countries_export.csv")
+        else:
+            st.error("Export failed")
+    
+    if st.button("Clear All Colors", type="primary", use_container_width=True):
+        utils.save_country_colors({})
+        refresh_colors()
+        st.rerun()
 
 geojson_data = get_geojson_data()
 
-if st.session_state.admin_authenticated:
-    st.sidebar.subheader("Edit Map Colors (Admin Only)")
-    
-    selected_country = st.sidebar.selectbox("Select a country:", custom_countries)
-    
-    color_options = {
-        "Red": "#FF0000",
-        "Green": "#00FF00",
-        "Yellow": "#FFFF00"
-    }
-    selected_color_name = st.sidebar.selectbox("Select color to highlight country:", list(color_options.keys()))
-    selected_color = color_options[selected_color_name]
-    
-    if st.sidebar.button("Apply Color"):
-        st.session_state.country_colors[selected_country] = {
-            "color": selected_color,
-            "color_name": selected_color_name
-        }
-        save_country_colors()
-        st.success(f"Color {selected_color_name} applied to {selected_country}")
-    
-st.sidebar.subheader("Currently Colored Countries")
-if st.session_state.country_colors:
-    if st.session_state.admin_authenticated:
-        edit_country = st.sidebar.selectbox("Select country to edit:", 
-                                          ["None"] + list(st.session_state.country_colors.keys()))
-        
-        if edit_country != "None":
-            col1, col2 = st.sidebar.columns(2)
-            
-            with col1:
-                edit_color = st.selectbox(
-                    "Change color:", 
-                    list(color_options.keys()),
-                    index=list(color_options.keys()).index(st.session_state.country_colors[edit_country]["color_name"]) 
-                    if edit_country in st.session_state.country_colors else 0
-                )
-            
-            with col2:
-                if st.button("Update"):
-                    st.session_state.country_colors[edit_country] = {
-                        "color": color_options[edit_color],
-                        "color_name": edit_color
-                    }
-                    save_country_colors()  # Save colors after updating
-                    st.success(f"Updated {edit_country} to {edit_color}")
-                    st.rerun()
-                
-                if st.button("Clear"):
-                    del st.session_state.country_colors[edit_country]
-                    save_country_colors()  # Save colors after removing a country
-                    st.success(f"Cleared color for {edit_country}")
-                    st.rerun()
-    st.sidebar.subheader("Color Legend")
-    for country, color_data in st.session_state.country_colors.items():
-        color_hex = color_data["color"]
-        st.sidebar.markdown(
-            f"<div style='display: flex; align-items: center;'>"
-            f"<div style='background-color: {color_hex}; width: 15px; height: 15px; margin-right: 8px;'></div>"
-            f"<div>{country}: {color_data['color_name']}</div>"
-            f"</div>",
-            unsafe_allow_html=True
-        )
-else:
-    st.sidebar.text("No countries colored yet")
+map_center = [20, 0]
+map_zoom = 2
 
-if st.session_state.admin_authenticated and st.session_state.country_colors:
-    if st.sidebar.button("Clear All Colors"):
-        st.session_state.country_colors = {}
-        save_country_colors()  # Save the empty state after clearing all
-        st.success("All country colors cleared")
-        st.rerun()
+focus_country = st.session_state.get('search_focus')
 
-m = folium.Map(location=[20, 0], zoom_start=2)
+if focus_country:
+    for feature in geojson_data['features']:
+        if feature['properties']['name'] == focus_country:
+            coords = feature['geometry']['coordinates']
+            if feature['geometry']['type'] == 'Polygon':
+                lon, lat = coords[0][0]
+            elif feature['geometry']['type'] == 'MultiPolygon':
+                lon, lat = coords[0][0][0]
+            map_center = [lat, lon]
+            map_zoom = 5
+            break
+
+m = folium.Map(location=map_center, zoom_start=map_zoom)
 
 def style_function(feature):
     country_name = feature["properties"]["name"]
+    is_focused = (country_name == focus_country)
+    
     if country_name in st.session_state.country_colors:
         return {
             'fillColor': st.session_state.country_colors[country_name]["color"],
-            'color': 'black',
-            'weight': 2,
-            'fillOpacity': 0.7
+            'color': 'yellow' if is_focused else 'black',
+            'weight': 4 if is_focused else 2.5,
+            'fillOpacity': 0.9 if is_focused else 0.8,
+            'stroke': True
         }
-    else:
-        return {
-            'fillColor': '#FFFFFF',
-            'color': 'black',
-            'weight': 1,
-            'fillOpacity': 0.1
-        }
+    
+    return {
+        'fillColor': '#FFFFFF',
+        'color': 'yellow' if is_focused else 'black',
+        'weight': 4 if is_focused else 1.5,
+        'fillOpacity': 0.5 if is_focused else 0.2,
+        'stroke': True
+    }
 
 folium.GeoJson(
     geojson_data,
     style_function=style_function,
-    highlight_function=lambda x: {'weight': 3, 'fillOpacity': 0.7},
+    highlight_function=lambda x: {'weight': 4, 'fillOpacity': 0.8},
     tooltip=folium.GeoJsonTooltip(fields=['name'], aliases=['Country'])
 ).add_to(m)
 
-if st.session_state.admin_authenticated:
-    current_color_text = f"with {selected_color_name.lower()} color" if 'selected_country' in locals() and selected_country in st.session_state.country_colors else "(not yet colored)"
-    st.write(f"**Currently selected:** {selected_country if 'selected_country' in locals() else 'None'} {current_color_text}")
+st_folium(m, width=800, height=500)
 
-st_folium(m, width=700, height=500)
+st.markdown("### 🗺️ Color Legend")
+if st.session_state.country_colors:
+    cols = st.columns(len(utils.COLOR_MAPPING))
+    for i, (color_name, color_hex) in enumerate(utils.COLOR_MAPPING.items()):
+        with cols[i]:
+            countries = [c for c, data in st.session_state.country_colors.items() if data["color_name"] == color_name]
+            if countries:
+                st.markdown(f"**{color_name}**")
+                st.markdown(f"<div style='background-color: {color_hex}; width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 5px;'></div>", unsafe_allow_html=True)
+                
+                for country in countries:
+                    if st.button(country, key=f"legend_{country}"):
+                        st.session_state.search_focus = country
+                        st.rerun()
+else:
+    st.info("No countries colored yet")
 
 st.sidebar.markdown("---")
-st.sidebar.info("Only administrators can modify the map colors. All users can view the map.")
+st.sidebar.caption("Only administrators can modify the map colors. All users can view.")
