@@ -2,6 +2,7 @@ import json
 import os
 import pandas as pd
 from supabase import create_client
+from unidecode import unidecode
 
 COLOR_MAPPING = {
     "Red": "#FF0000",
@@ -32,7 +33,8 @@ def get_csv_path():
     return os.path.join(os.path.dirname(__file__), 'countries.csv')
 
 def normalize_country_name(name):
-    return NAME_NORMALIZATION_MAP.get(name, name)
+    mapped = NAME_NORMALIZATION_MAP.get(name, name)
+    return unidecode(mapped)
 
 def get_geojson_country_names():
     geojson_path = os.path.join(os.path.dirname(__file__), 'world_countries.json')
@@ -52,10 +54,14 @@ def load_country_colors():
         response = supabase.table("country_colors").select("*").execute()
         colors_dict = {}
         for row in response.data:
-            colors_dict[row['country_name']] = {
+            original_name = row['country_name']
+            unidecoded_name = unidecode(original_name)
+            color_data = {
                 "color": row['color_code'],
                 "color_name": row['color_name']
             }
+            colors_dict[original_name] = color_data
+            colors_dict[unidecoded_name] = color_data
         return colors_dict
     except Exception as e:
         print(f"Error loading from Supabase: {e}")

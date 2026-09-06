@@ -108,6 +108,7 @@ if selection == "⚙️ Admin Panel":
             if new_country_name.strip():
                 success, msg = utils.add_country(new_country_name.strip(), new_country_color)
                 if success:
+                    st.cache_data.clear()
                     refresh_colors()
                     st.success(msg)
                 else:
@@ -124,6 +125,7 @@ if selection == "⚙️ Admin Panel":
             if st.button("Confirm Remove", use_container_width=True, key="remove_country_btn"):
                 success, msg = utils.remove_country(remove_country)
                 if success:
+                    st.cache_data.clear()
                     refresh_colors()
                     st.success(msg)
                 else:
@@ -193,16 +195,16 @@ def style_function(feature):
     if country_name in st.session_state.country_colors:
         return {
             'fillColor': st.session_state.country_colors[country_name]["color"],
-            'color': 'yellow' if is_focused else 'black',
-            'weight': 4 if is_focused else 2.5,
+            'color': 'white' if is_focused else 'black',
+            'weight': 3 if is_focused else 2.5,
             'fillOpacity': 0.9 if is_focused else 0.8,
             'stroke': True
         }
     
     return {
         'fillColor': '#FFFFFF',
-        'color': 'yellow' if is_focused else 'black',
-        'weight': 4 if is_focused else 1.5,
+        'color': 'white' if is_focused else 'black',
+        'weight': 3 if is_focused else 1.5,
         'fillOpacity': 0.5 if is_focused else 0.2,
         'stroke': True
     }
