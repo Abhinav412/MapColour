@@ -7,7 +7,8 @@ from unidecode import unidecode
 COLOR_MAPPING = {
     "Red": "#FF0000",
     "Green": "#00FF00",
-    "Yellow": "#FFFF00"
+    "Yellow": "#FFFF00",
+    "White": "#FFFFFF"
 }
 
 NAME_NORMALIZATION_MAP = {

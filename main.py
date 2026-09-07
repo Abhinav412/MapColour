@@ -195,7 +195,7 @@ def style_function(feature):
     if country_name in st.session_state.country_colors:
         return {
             'fillColor': st.session_state.country_colors[country_name]["color"],
-            'color': 'white' if is_focused else 'black',
+            'color': 'grey' if is_focused else 'black',
             'weight': 3 if is_focused else 2.5,
             'fillOpacity': 0.9 if is_focused else 0.8,
             'stroke': True
@@ -203,7 +203,7 @@ def style_function(feature):
     
     return {
         'fillColor': '#FFFFFF',
-        'color': 'white' if is_focused else 'black',
+        'color': 'grey' if is_focused else 'black',
         'weight': 3 if is_focused else 1.5,
         'fillOpacity': 0.5 if is_focused else 0.2,
         'stroke': True
