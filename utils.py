@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from supabase import create_client
 from unidecode import unidecode
+import regions
 
 COLOR_MAPPING = {
     "Red": "#FF0000",
@@ -36,6 +37,10 @@ def get_csv_path():
 def normalize_country_name(name):
     mapped = NAME_NORMALIZATION_MAP.get(name, name)
     return unidecode(mapped)
+
+def get_country_region(country_name):
+    unidecoded = unidecode(country_name)
+    return regions.get_region(unidecoded)
 
 def get_geojson_country_names():
     geojson_path = os.path.join(os.path.dirname(__file__), 'world_countries.json')
